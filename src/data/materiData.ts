@@ -96,31 +96,66 @@ export const materiBkLengkap: MateriSlide[] = [
     subtitle: "Pendamping Lengkap Perkembangan Siswa",
     iconName: "Sparkles",
     themeColor: "from-indigo-600 to-violet-800",
-    summary: "Layanan BK tidak hanya menyelesaikan masalah, tetapi juga memahami, mencegah, memelihara, dan mengembangkan potensi.",
+    summary: "Layanan Bimbingan dan Konseling di SMPN 7 Pasuruan menjalankan 10 fungsi utama untuk mendukung perkembangan peserta didik secara optimal, menyeluruh, dan berkelanjutan.",
     points: [
       {
-        title: "Pemahaman & Pencegahan",
-        desc: "Membantu siswa memahami diri dan mencegah munculnya hambatan emosi/belajar.",
+        title: "1. Fungsi Pemahaman",
+        desc: "Membantu siswa memahami kekuatan diri, potensi, minat, serta kondisi lingkungan sekolah dan sosial.",
         icon: "Brain"
       },
       {
-        title: "Pengentasan & Perbaikan",
-        desc: "Membantu menyelesaikan masalah pribadi/sosial dan memperbaiki perilaku kurang efektif.",
+        title: "2. Fungsi Pencegahan (Preventif)",
+        desc: "Mencegah timbulnya berbagai masalah emosional, sosial, maupun hambatan belajar sebelum terjadi.",
+        icon: "ShieldAlert"
+      },
+      {
+        title: "3. Fungsi Pengentasan (Kuratif)",
+        desc: "Membantu mengentaskan dan menyelesaikan masalah pribadi, sosial, atau belajar yang dialami siswa.",
         icon: "LifeBuoy"
       },
       {
-        title: "Pemeliharaan & Pengembangan",
-        desc: "Memelihara potensi positif siswa dan mengembangkannya secara berkelanjutan.",
+        title: "4. Fungsi Pemeliharaan",
+        desc: "Memelihara kebiasaan positif dan potensi baik yang sudah dimiliki siswa agar tidak mengalami penurunan.",
+        icon: "CheckCircle2"
+      },
+      {
+        title: "5. Fungsi Pengembangan",
+        desc: "Mengembangkan potensi, bakat, minat, serta bakat kepemimpinan dan kreativitas secara optimal.",
         icon: "TrendingUp"
+      },
+      {
+        title: "6. Fungsi Perbaikan (Rehabilitatif)",
+        desc: "Memperbaiki persepsi kekeliruan, emosi tidak stabil, atau perilaku kurang efektif agar kembali positif.",
+        icon: "RefreshCw"
+      },
+      {
+        title: "7. Fungsi Penyaluran",
+        desc: "Membantu siswa memilih ekstrakurikuler, minat belajar, serta perencanaan karier dan studi masa depan.",
+        icon: "Compass"
+      },
+      {
+        title: "8. Fungsi Adaptasi",
+        desc: "Membantu sekolah dan guru mengadaptasikan program pembelajaran sesuai karakteristik unik siswa.",
+        icon: "Sliders"
+      },
+      {
+        title: "9. Fungsi Penyesuaian",
+        desc: "Membantu siswa menyesuaikan diri secara harmonis dan percaya diri dengan lingkungan baru di SMP.",
+        icon: "Users"
+      },
+      {
+        title: "10. Fungsi Advokasi",
+        desc: "Membela dan melindungi hak-hak serta kepentingan peserta didik jika mengalami ketidakadilan.",
+        icon: "ShieldCheck"
       }
     ],
     interactiveQuiz: {
-      question: "Fungsi BK yang membantu memelihara kebiasaan baik siswa agar tetap konsisten disebut...",
-      options: ["Fungsi Pemeliharaan", "Fungsi Hukuman", "Fungsi Isolasi", "Fungsi Penagihan"],
+      question: "Fungsi BK yang bertugas membela dan melindungi hak-hak peserta didik dari tindakan tidak adil disebut...",
+      options: ["Fungsi Advokasi", "Fungsi Penyaluran", "Fungsi Penyesuaian", "Fungsi Hukuman"],
       correctIndex: 0,
-      explanation: "Fungsi Pemeliharaan menjaga agar hal-hal positif yang telah dimiliki siswa tetap terjaga dengan baik."
+      explanation: "Fungsi Advokasi bertugas mendampingi serta menjaga hak dan keadilan bagi peserta didik."
     },
-    audioScript: "Layanan BK menjalankan berbagai fungsi penting: mulai dari pemahaman diri, pencegahan masalah, pengentasan hambatan, hingga pemeliharaan potensi diri siswa."
+    audioScript: "Layanan BK menjalankan 10 fungsi utama mulai dari Pemahaman, Pencegahan, Pengentasan, Pemeliharaan, Pengembangan, Perbaikan, Penyaluran, Adaptasi, Penyesuaian, hingga Advokasi hak-hak siswa."
   },
   {
     id: 4,
