@@ -3,6 +3,7 @@ import { rppMendalamBK } from '../data/rppData';
 import { 
   FileText, 
   Printer, 
+  FileDown,
   CheckCircle2, 
   Sparkles, 
   GraduationCap, 
@@ -17,6 +18,109 @@ import {
 export const RppView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'semua' | 'identitas' | 'identifikasi' | 'desain' | 'pelaksanaan'>('semua');
   const [printNotification, setPrintNotification] = useState<string | null>(null);
+
+  const handleDownloadWord = () => {
+    setActiveSection('semua');
+    setPrintNotification('Mempersiapkan dokumen Word (.doc) RPP Layanan BK...');
+
+    setTimeout(() => {
+      const printElement = document.getElementById('rpp-printable-document');
+      if (!printElement) {
+        setPrintNotification(null);
+        return;
+      }
+
+      const contentHtml = printElement.innerHTML;
+
+      // HTML template configured for Microsoft Word compatibility
+      const wordDocument = `
+        <html xmlns:o='urn:schemas-microsoft-microsoft-com:office:office'
+              xmlns:w='urn:schemas-microsoft-microsoft-com:office:word'
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>RPP_Layanan_BK_SMPN7_Pasuruan</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 11pt;
+              color: #0f172a;
+              background-color: #ffffff;
+              line-height: 1.5;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 12pt;
+            }
+            th, td {
+              border: 1px solid #cbd5e1;
+              padding: 8pt;
+              vertical-align: top;
+              font-size: 10pt;
+            }
+            th {
+              background-color: #f1f5f9;
+              font-weight: bold;
+              text-align: left;
+            }
+            h1, h2, h3, h4 {
+              font-family: Arial, sans-serif;
+              color: #022c22;
+              margin-top: 8pt;
+              margin-bottom: 6pt;
+            }
+            ul, ol {
+              margin-top: 4pt;
+              margin-bottom: 4pt;
+              padding-left: 20pt;
+            }
+            li {
+              margin-bottom: 3pt;
+            }
+            .no-print, button {
+              display: none !important;
+            }
+            .bg-slate-50, .bg-slate-900\/50 {
+              background-color: #f8fafc !important;
+            }
+            .border-slate-200, .border-slate-800 {
+              border-color: #cbd5e1 !important;
+            }
+            img {
+              max-width: 80px;
+              height: auto;
+            }
+          </style>
+        </head>
+        <body>
+          <div style="font-family: Arial, sans-serif;">
+            ${contentHtml}
+          </div>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + wordDocument], {
+        type: 'application/msword;charset=utf-8'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'RPP_Layanan_BK_DeepLearning_SMPN7Pasuruan.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setPrintNotification(null);
+    }, 250);
+  };
 
   const handlePrint = () => {
     // 1. Reset filter tab to show all sections
@@ -103,14 +207,26 @@ export const RppView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={handlePrint}
-          id="btn-cetak-rpp"
-          className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all self-start md:self-auto cursor-pointer"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Cetak / Download PDF</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+          <button
+            onClick={handleDownloadWord}
+            id="btn-download-word-rpp"
+            className="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer"
+            title="Download RPP dalam format Microsoft Word (.doc)"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>Download Word (.doc)</span>
+          </button>
+          <button
+            onClick={handlePrint}
+            id="btn-cetak-rpp"
+            className="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer"
+            title="Cetak atau simpan sebagai PDF"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Cetak / PDF</span>
+          </button>
+        </div>
       </div>
 
       {/* Navigation Filter Tabs */}
@@ -139,25 +255,139 @@ export const RppView: React.FC = () => {
       {/* MAIN RPP TABLE CONTAINER */}
       <div id="rpp-printable-document" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden print:border-none print:shadow-none">
         
-        {/* Printable Header */}
-        <div className="p-8 border-b border-slate-200 dark:border-slate-800 text-center space-y-2 bg-slate-50 dark:bg-slate-900/50">
-          <div className="flex items-center justify-center gap-4 mb-2">
-            <img 
-              src="https://iili.io/KDFk4fI.png" 
-              alt="Logo SMPN 7 Pasuruan" 
-              className="w-16 h-16 object-contain"
-              referrerPolicy="no-referrer"
-            />
-            <div className="text-left">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                SMP NEGERI 7 PASURUAN
-              </h1>
-              <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                PEMBELAJARAN MENDALAM (DEEP LEARNING) BIMBINGAN DAN KONSELING
-              </p>
-              <p className="text-[11px] text-slate-500">Tahun Ajaran 2025/2026 • Penyusun: Wiwik Ismiati, S.Pd.</p>
+        {/* Official Kop Surat UPT SMP Negeri 7 Pasuruan */}
+        <div className="p-6 sm:p-8 bg-white dark:bg-slate-900 border-b-4 border-double border-slate-900 dark:border-slate-200">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
+            
+            {/* Logo Pemkot Pasuruan (Left) */}
+            <div className="w-20 h-24 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 200 240" className="w-18 h-22 drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+                {/* 1. Outer Red Oval Ring */}
+                <ellipse cx="100" cy="120" rx="96" ry="116" fill="#e11d48" stroke="#1e293b" strokeWidth="2.5" />
+                <ellipse cx="100" cy="120" rx="88" ry="108" fill="#ffffff" stroke="#1e293b" strokeWidth="1.5" />
+                
+                {/* 2. Inner Teal-Green Background Field */}
+                <ellipse cx="100" cy="120" rx="80" ry="100" fill="#00907c" stroke="#004d42" strokeWidth="2" />
+
+                {/* 3. Mountain & Sea Waves Contour in Background */}
+                <path d="M 25 125 Q 70 95 100 112 Q 130 95 175 125" fill="none" stroke="#006657" strokeWidth="2" />
+                <path d="M 25 135 Q 60 128 100 135 Q 140 128 175 135" fill="none" stroke="#005246" strokeWidth="1.5" />
+
+                {/* 4. Yellow Bintang (5-Pointed Star) at Top */}
+                <g transform="translate(100, 48)">
+                  <polygon points="0,-16 4.7,-4.8 15.2,-4.8 6.7,1.8 10,12 0,5.2 -10,12 -6.7,1.8 -15.2,-4.8 -4.7,-4.8" fill="#facc15" stroke="#1e293b" strokeWidth="1.5" strokeLinejoin="round" />
+                </g>
+
+                {/* 5. Tugu Pasuruan Monument (Center Gold Monument & Base Steps) */}
+                <g transform="translate(100, 130)">
+                  {/* Step Base */}
+                  <polygon points="-38,30 38,30 32,22 -32,22" fill="#eab308" stroke="#1e293b" strokeWidth="1.5" />
+                  <polygon points="-30,22 30,22 25,14 -25,14" fill="#facc15" stroke="#1e293b" strokeWidth="1.5" />
+                  <polygon points="-22,14 22,14 18,6 -18,6" fill="#fef08a" stroke="#1e293b" strokeWidth="1.5" />
+                  {/* Scroll Base Ornaments */}
+                  <path d="M -35 22 Q -25 10 -18 14" fill="none" stroke="#1e293b" strokeWidth="1.5" />
+                  <path d="M 35 22 Q 25 10 18 14" fill="none" stroke="#1e293b" strokeWidth="1.5" />
+                  {/* Main Column */}
+                  <path d="M -10 6 L -7 -55 Q 0 -65 7 -55 L 10 6 Z" fill="#facc15" stroke="#1e293b" strokeWidth="1.5" />
+                  <path d="M -2 -58 Q 0 -65 2 -58 L 3 6 L -3 6 Z" fill="#fef08a" />
+                  {/* Rings / Moldings on Column */}
+                  <line x1="-8.5" y1="-20" x2="8.5" y2="-20" stroke="#1e293b" strokeWidth="1.5" />
+                  <line x1="-9" y1="-5" x2="9" y2="-5" stroke="#1e293b" strokeWidth="1.5" />
+                </g>
+
+                {/* 6. Rice Stalk (Padi) on Left */}
+                <g transform="translate(100, 120)">
+                  <path d="M -5 75 Q -55 50 -58 -30 Q -56 -60 -30 -65" fill="none" stroke="#ca8a04" strokeWidth="2.5" />
+                  {/* Rice Grains */}
+                  {[
+                    { x: -55, y: -25, r: -20 }, { x: -58, y: -10, r: -15 }, { x: -58, y: 5, r: -10 },
+                    { x: -55, y: 20, r: -5 }, { x: -50, y: 33, r: 0 }, { x: -42, y: 45, r: 10 },
+                    { x: -48, y: -38, r: -25 }, { x: -38, y: -50, r: -35 }, { x: -28, y: -58, r: -50 },
+                    { x: -18, y: -62, r: -65 }, { x: -35, y: -18, r: -15 }, { x: -38, y: -2, r: -10 },
+                    { x: -38, y: 12, r: -5 }, { x: -34, y: 26, r: 5 }
+                  ].map((g, i) => (
+                    <ellipse key={i} cx={g.x} cy={g.y} rx="5.5" ry="10" fill="#facc15" stroke="#1e293b" strokeWidth="1.2" transform={`rotate(${g.r}, ${g.x}, ${g.y})`} />
+                  ))}
+                </g>
+
+                {/* 7. Cotton Branch (Kapas) on Right */}
+                <g transform="translate(100, 120)">
+                  <path d="M 5 75 Q 55 50 58 -30 Q 56 -60 30 -65" fill="none" stroke="#15803d" strokeWidth="2.5" />
+                  {/* Cotton Bolls */}
+                  {[
+                    { x: 55, y: -25 }, { x: 58, y: -5 }, { x: 55, y: 15 },
+                    { x: 48, y: 35 }, { x: 38, y: 50 }, { x: 45, y: -42 },
+                    { x: 32, y: -58 }, { x: 20, y: -64 }
+                  ].map((c, i) => (
+                    <g key={i} transform={`translate(${c.x}, ${c.y})`}>
+                      {/* Green Calyx */}
+                      <path d="M -6 4 Q 0 8 6 4 Q 0 -2 -6 4 Z" fill="#16a34a" stroke="#1e293b" strokeWidth="1" />
+                      {/* Fluffy White Cotton */}
+                      <circle cx="-4" cy="-4" r="4.5" fill="#ffffff" stroke="#1e293b" strokeWidth="1" />
+                      <circle cx="4" cy="-4" r="4.5" fill="#ffffff" stroke="#1e293b" strokeWidth="1" />
+                      <circle cx="0" cy="-7.5" r="5" fill="#ffffff" stroke="#1e293b" strokeWidth="1" />
+                    </g>
+                  ))}
+                </g>
+
+                {/* 8. White Banner Ribbon "SURA DIRA SATYA PATI" */}
+                <g transform="translate(100, 180)">
+                  <path d="M -75 8 L -65 -12 L 65 -12 L 75 8 L 65 14 L 0 10 L -65 14 Z" fill="#e2e8f0" stroke="#1e293b" strokeWidth="1.5" />
+                  <path d="M -65 -12 Q 0 -22 65 -12 Q 72 2 65 12 Q 0 2 0 2 Q 0 2 -65 12 Q -72 2 -65 -12 Z" fill="#ffffff" stroke="#1e293b" strokeWidth="1.8" />
+                  <text x="0" y="-1" fontSize="9" fontWeight="900" fill="#0f172a" textAnchor="middle" letterSpacing="0.6" fontFamily="sans-serif">
+                    SURA DIRA SATYA PATI
+                  </text>
+                </g>
+
+                {/* 9. Red & White Shield at Bottom Intersection */}
+                <g transform="translate(100, 204)">
+                  <path d="M -12 -10 L 0 -10 L 0 12 C -6 12 -12 6 -12 -10 Z" fill="#dc2626" stroke="#1e293b" strokeWidth="1.2" />
+                  <path d="M 0 -10 L 12 -10 L 12 -10 C 12 6 6 12 0 12 Z" fill="#ffffff" stroke="#1e293b" strokeWidth="1.2" />
+                  <path d="M -20 -4 Q -10 2 -10 -10 M 20 -4 Q 10 2 10 -10" fill="none" stroke="#dc2626" strokeWidth="2.5" />
+                </g>
+              </svg>
             </div>
+
+            {/* Kop Surat Center Text */}
+            <div className="flex-1 text-slate-900 dark:text-white space-y-0.5">
+              <h2 className="text-sm sm:text-base font-extrabold uppercase tracking-widest text-slate-900 dark:text-white leading-tight">
+                PEMERINTAH KOTA PASURUAN
+              </h2>
+              <h1 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-slate-900 dark:text-white leading-tight">
+                UPT SMP NEGERI 7
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-medium">
+                Jalan Simpang Slamet Riadi Nomor 2, Kota Pasuruan, Jawa Timur, 67139
+              </p>
+              <p className="text-xs text-slate-800 dark:text-slate-200 font-medium">
+                Telepon (0343) 426845
+              </p>
+              <p className="text-xs text-slate-800 dark:text-slate-200 font-medium">
+                Pos-el <span className="underline italic text-blue-600 dark:text-blue-400">smp7pas@yahoo.co.id</span>, Laman <span className="underline italic text-blue-600 dark:text-blue-400">www.smpn7pasuruan.sch.id</span>
+              </p>
+            </div>
+
+            {/* Logo SMP Negeri 7 Pasuruan (Right) */}
+            <div className="w-20 h-24 flex items-center justify-center shrink-0">
+              <img 
+                src="https://iili.io/KDFk4fI.png" 
+                alt="Logo SMP Negeri 7 Pasuruan" 
+                className="w-16 h-20 object-contain drop-shadow"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
           </div>
+        </div>
+
+        {/* Document Title Sub-banner */}
+        <div className="bg-emerald-800 text-white p-4 text-center space-y-1">
+          <h2 className="text-base sm:text-lg font-extrabold uppercase tracking-wide">
+            RENCANA PELAKSANAAN PEMBELAJARAN (RPP) LAYANAN BK
+          </h2>
+          <p className="text-xs font-semibold text-emerald-200">
+            PEMBELAJARAN MENDALAM (DEEP LEARNING) • KELAS VII • TAHUN AJARAN 2025/2026
+          </p>
         </div>
 
         <div className="divide-y divide-slate-200 dark:divide-slate-800 text-xs sm:text-sm">
