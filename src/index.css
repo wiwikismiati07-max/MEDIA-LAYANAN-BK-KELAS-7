@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@media print {
+  /* Hide navbar, footer, banners, and buttons when printing */
+  nav,
+  header,
+  footer,
+  .no-print,
+  .print\:hidden,
+  #btn-cetak-rpp,
+  button {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print\:border-none {
+    border: none !important;
+  }
+
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  /* Force clean exact colors for letterhead and table lines */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
