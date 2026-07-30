@@ -34,7 +34,9 @@ interface PresensiViewProps {
 export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPresensiList }) => {
   // Master Student dataset state per Rombel (initialized from localStorage or default masterSiswaList)
   const [siswaMaster, setSiswaMaster] = useState<Record<RombelClass, SiswaMaster[]>>(() => {
-    const saved = localStorage.getItem('smpn7_siswa_master_v2');
+    // Clear legacy cache keys containing dummy data
+    localStorage.removeItem('smpn7_siswa_master_v2');
+    const saved = localStorage.getItem('smpn7_siswa_master_v3');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -66,7 +68,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
 
   // Save to localStorage when siswaMaster changes
   useEffect(() => {
-    localStorage.setItem('smpn7_siswa_master_v2', JSON.stringify(siswaMaster));
+    localStorage.setItem('smpn7_siswa_master_v3', JSON.stringify(siswaMaster));
   }, [siswaMaster]);
 
   // Sync selected student when rombel or siswaMaster changes
@@ -164,8 +166,8 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
   // Reset master student list to original default
   const handleResetToDefault = () => {
     setSiswaMaster(masterSiswaList);
-    localStorage.removeItem('smpn7_siswa_master_v2');
-    setUploadMessage('Daftar siswa seluruh kelas telah dikembalikan ke data awal sekolah.');
+    localStorage.removeItem('smpn7_siswa_master_v3');
+    setUploadMessage('Daftar siswa seluruh kelas telah dibersihkan.');
     setTimeout(() => setUploadMessage(null), 4000);
   };
 
@@ -390,15 +392,37 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
       return;
     }
 
+    const trimmedNama = nama.trim();
+    const trimmedNisn = nisn.trim();
+
+    // Auto-save student name to permanent class roster in siswaMaster if not present yet
+    setSiswaMaster(prev => {
+      const currentList = prev[rombel] || [];
+      const exists = currentList.some(s => s.nama.toLowerCase() === trimmedNama.toLowerCase());
+      if (!exists) {
+        const newStudent: SiswaMaster = {
+          id: `perm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          nama: trimmedNama,
+          nisn: trimmedNisn,
+          rombel: rombel
+        };
+        return {
+          ...prev,
+          [rombel]: [...currentList, newStudent]
+        };
+      }
+      return prev;
+    });
+
     const now = new Date();
     const dateStr = now.toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' });
     const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
     const newItem: PresensiItem = {
       id: Date.now().toString(),
-      nama,
+      nama: trimmedNama,
       rombel,
-      nisn,
+      nisn: trimmedNisn,
       tanggal: dateStr,
       waktu: timeStr,
       keterangan,
@@ -704,9 +728,41 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
 
             {/* Nama Lengkap Input Field */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">
-                Nama Lengkap Siswa:
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-slate-700 dark:text-slate-300 block">
+                  Nama Lengkap Siswa:
+                </label>
+                {nama.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const trimmedNama = nama.trim();
+                      const trimmedNisn = nisn.trim() || `008${Date.now().toString().slice(-6)}`;
+                      setSiswaMaster(prev => {
+                        const currentList = prev[rombel] || [];
+                        const exists = currentList.some(s => s.nama.toLowerCase() === trimmedNama.toLowerCase());
+                        if (exists) return prev;
+                        const newStudent: SiswaMaster = {
+                          id: `perm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+                          nama: trimmedNama,
+                          nisn: trimmedNisn,
+                          rombel: rombel
+                        };
+                        return {
+                          ...prev,
+                          [rombel]: [...currentList, newStudent]
+                        };
+                      });
+                      setUploadMessage(`Nama "${trimmedNama}" berhasil disimpan permanen di daftar Kelas ${rombel}.`);
+                      setTimeout(() => setUploadMessage(null), 3000);
+                    }}
+                    className="text-[10px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-lg font-bold border border-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    <span>Simpan Nama Permanen</span>
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -714,7 +770,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
                   required
                   value={nama}
                   onChange={(e) => setNama(e.target.value)}
-                  placeholder="Contoh: Muhammad Bayu Pratama"
+                  placeholder="Ketik Nama Lengkap Siswa"
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
@@ -730,7 +786,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({ presensiList, setPre
                 required
                 value={nisn}
                 onChange={(e) => setNisn(e.target.value)}
-                placeholder="Contoh: 0081234567 atau Absen 12"
+                placeholder="Ketik NISN atau No Absen"
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
